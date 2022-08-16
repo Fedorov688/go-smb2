@@ -3,7 +3,7 @@
 package smb2
 
 import (
-	"github.com/hirochachacha/go-smb2/internal/utf16le"
+	"github.com/NikitaTsaralov/go-smb2/internal/utf16le"
 )
 
 const (

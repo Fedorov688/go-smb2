@@ -1,4 +1,4 @@
-module github.com/hirochachacha/go-smb2
+module github.com/NikitaTsaralov/go-smb2
 
 go 1.12
 
