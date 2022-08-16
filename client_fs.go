@@ -107,8 +107,8 @@ type wfile struct {
 	*File
 }
 
-func (f *wfile) ReadDir(n int) (dirents []fs.DirEntry, err error) {
-	infos, err := f.Readdir(n)
+func (f *wfile) ReadDir(n int, pattern string) (dirents []fs.DirEntry, err error) {
+	infos, err := f.Readdir(n, pattern)
 	if err != nil {
 		return nil, err
 	}
