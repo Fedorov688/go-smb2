@@ -7,6 +7,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/Fedorov688/go-smb2"
 	"io"
 	"io/ioutil"
 	"net"
@@ -15,8 +16,6 @@ import (
 	"sort"
 	"strings"
 	"time"
-
-	"github.com/hirochachacha/go-smb2"
 
 	"testing"
 )
@@ -152,7 +151,7 @@ func TestReaddir(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer fs.RemoveAll(testDir)
+	defer fs.RemoveAll(testDir, "*")
 
 	d, err := fs.Open(testDir)
 	if err != nil {
@@ -160,7 +159,7 @@ func TestReaddir(t *testing.T) {
 	}
 	defer d.Close()
 
-	fi, err := d.Readdir(-1)
+	fi, err := d.Readdir(-1, "*")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -181,7 +180,7 @@ func TestReaddir(t *testing.T) {
 	}
 	defer d2.Close()
 
-	fi2, err := d2.Readdir(-1)
+	fi2, err := d2.Readdir(-1, "*")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -189,7 +188,7 @@ func TestReaddir(t *testing.T) {
 		t.Error("unexpected content length:", len(fi2))
 	}
 
-	fi2, err = d2.Readdir(1)
+	fi2, err = d2.Readdir(1, "*")
 	if err != io.EOF {
 		t.Error("unexpected error: ", err)
 	}
@@ -204,7 +203,7 @@ func TestFile(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer fs.RemoveAll(testDir)
+	defer fs.RemoveAll(testDir, "*")
 
 	f, err := fs.Create(testDir + `\testFile`)
 	if err != nil {
@@ -310,7 +309,7 @@ func TestSymlink(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer fs.RemoveAll(testDir)
+	defer fs.RemoveAll(testDir, "*")
 
 	f, err := fs.Create(testDir + `\testFile`)
 	if err != nil {
@@ -376,7 +375,7 @@ func TestIsXXX(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer fs.RemoveAll(testDir)
+	defer fs.RemoveAll(testDir, "*")
 
 	f, err := fs.Create(testDir + `\Exist`)
 	if err != nil {
@@ -451,7 +450,7 @@ func TestRename(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer fs.RemoveAll(testDir)
+	defer fs.RemoveAll(testDir, "*")
 
 	f, err := fs.Create(testDir + `\old`)
 	if err != nil {
@@ -503,7 +502,7 @@ func TestChtimes(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer fs.RemoveAll(testDir)
+	defer fs.RemoveAll(testDir, "*")
 
 	f, err := fs.Create(testDir + `\testFile`)
 	if err != nil {
@@ -549,7 +548,7 @@ func TestChmod(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer fs.RemoveAll(testDir)
+	defer fs.RemoveAll(testDir, "*")
 
 	f, err := fs.Create(testDir + `\testFile`)
 	if err != nil {
@@ -611,7 +610,7 @@ func TestServerSideCopy(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer fs.RemoveAll(testDir)
+	defer fs.RemoveAll(testDir, "*")
 
 	err = fs.WriteFile(join(testDir, "src.txt"), []byte("hello world!"), 0666)
 	if err != nil {
@@ -666,7 +665,7 @@ func TestRemoveAll(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	err = fs.RemoveAll(testDir)
+	err = fs.RemoveAll(testDir, "*")
 	if err != nil {
 		t.Error(err)
 	}
@@ -743,7 +742,7 @@ func TestContextError(t *testing.T) {
 	checkError2("open", err)
 	_, err = fs.OpenFile("aaa", 0, 0)
 	checkError2("openfile", err)
-	_, err = fs.ReadDir("aaa")
+	_, err = fs.ReadDir("aaa", "*")
 	checkError2("readdir", err)
 	_, err = fs.ReadFile("aaa")
 	checkError2("readfile", err)
@@ -751,7 +750,7 @@ func TestContextError(t *testing.T) {
 	checkError2("readlink", err)
 	err = fs.Remove("aaa")
 	checkError2("remove", err)
-	err = fs.RemoveAll("aaa")
+	err = fs.RemoveAll("aaa", "*")
 	checkError2("removeall", err)
 	err = fs.Rename("aaa", "bbb")
 	checkError2("rename", err)
@@ -776,9 +775,9 @@ func TestContextError(t *testing.T) {
 	checkError2("freadat", err)
 	_, err = f.ReadFrom(strings.NewReader("aaa"))
 	checkError2("freadfrom", err)
-	_, err = f.Readdir(-1)
+	_, err = f.Readdir(-1, "*")
 	checkError2("freaddir", err)
-	_, err = f.Readdirnames(-1)
+	_, err = f.Readdirnames(-1, "*")
 	checkError2("freaddirnames", err)
 	_, err = f.Seek(1, io.SeekEnd)
 	checkError2("fseek", err)
@@ -813,7 +812,7 @@ func TestGlob(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer fs.RemoveAll(testDir)
+	defer fs.RemoveAll(testDir, "*")
 
 	for _, dir := range []string{"", "dir1", "dir2", "dir3"} {
 		if dir != "" {

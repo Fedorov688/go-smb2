@@ -2,11 +2,10 @@ package smb2_test
 
 import (
 	"fmt"
+	"github.com/Fedorov688/go-smb2"
 	"io"
 	"io/ioutil"
 	"net"
-
-	"github.com/hirochachacha/go-smb2"
 )
 
 func Example() {

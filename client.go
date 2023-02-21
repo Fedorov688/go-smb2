@@ -13,10 +13,10 @@ import (
 	"sync"
 	"time"
 
-	. "github.com/hirochachacha/go-smb2/internal/erref"
-	. "github.com/hirochachacha/go-smb2/internal/smb2"
+	. "github.com/Fedorov688/go-smb2/internal/erref"
+	. "github.com/Fedorov688/go-smb2/internal/smb2"
 
-	"github.com/hirochachacha/go-smb2/internal/msrpc"
+	"github.com/Fedorov688/go-smb2/internal/msrpc"
 )
 
 // Dialer contains options for func (*Dialer) Dial.
@@ -792,14 +792,14 @@ func (fs *Share) Chmod(name string, mode os.FileMode) error {
 	return nil
 }
 
-func (fs *Share) ReadDir(dirname string) ([]os.FileInfo, error) {
+func (fs *Share) ReadDir(dirname string, pattern string) ([]os.FileInfo, error) {
 	f, err := fs.Open(dirname)
 	if err != nil {
 		return nil, err
 	}
 	defer f.Close()
 
-	fis, err := f.Readdir(-1)
+	fis, err := f.Readdir(-1, pattern)
 	if err != nil {
 		return nil, err
 	}
@@ -1264,7 +1264,7 @@ func (f *File) readAtChunk(n int, off int64) (bs []byte, isEOF bool, err error) 
 	return bs, len(bs) < m, nil
 }
 
-func (f *File) Readdir(n int) (fi []os.FileInfo, err error) {
+func (f *File) Readdir(n int, pattern string) (fi []os.FileInfo, err error) {
 	f.m.Lock()
 	defer f.m.Unlock()
 
@@ -1273,7 +1273,7 @@ func (f *File) Readdir(n int) (fi []os.FileInfo, err error) {
 			f.dirents = []os.FileInfo{}
 		}
 		for n <= 0 || n > len(f.dirents) {
-			dirents, err := f.readdir("*")
+			dirents, err := f.readdir(pattern)
 			if len(dirents) > 0 {
 				f.dirents = append(f.dirents, dirents...)
 			}
@@ -1309,8 +1309,8 @@ func (f *File) Readdir(n int) (fi []os.FileInfo, err error) {
 	return fi, nil
 }
 
-func (f *File) Readdirnames(n int) (names []string, err error) {
-	fi, err := f.Readdir(n)
+func (f *File) Readdirnames(n int, pattern string) (names []string, err error) {
+	fi, err := f.Readdir(n, pattern)
 	if err != nil {
 		return nil, err
 	}

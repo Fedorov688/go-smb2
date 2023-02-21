@@ -87,7 +87,7 @@ func (fs *Share) MkdirAll(path string, perm os.FileMode) error {
 // It removes everything it can but returns the first error
 // it encounters. If the path does not exist, RemoveAll
 // returns nil (no error).
-func (fs *Share) RemoveAll(path string) error {
+func (fs *Share) RemoveAll(path string, pattern string) error {
 	path = normPath(path)
 
 	// Simple case: if Remove works, we're done.
@@ -123,9 +123,9 @@ func (fs *Share) RemoveAll(path string) error {
 	// Remove contents & return first error.
 	err = nil
 	for {
-		names, err1 := fd.Readdirnames(100)
+		names, err1 := fd.Readdirnames(100, pattern)
 		for _, name := range names {
-			err1 := fs.RemoveAll(path + string(PathSeparator) + name)
+			err1 := fs.RemoveAll(path+string(PathSeparator)+name, pattern)
 			if err == nil {
 				err = err1
 			}
