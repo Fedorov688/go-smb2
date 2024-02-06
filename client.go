@@ -112,7 +112,7 @@ func (c *Session) Mount(sharename string) (*Share, error) {
 		return nil, err
 	}
 
-	return &Share{treeConn: tc, ctx: context.Background()}, nil
+	return &Share{treeConn: tc, ctx: context.Background(), mapWriterLock: &sync.RWMutex{}, dfsTargetList: map[string][]*DFSTarget{}}, nil
 }
 
 func (c *Session) ListSharenames() ([]string, error) {
